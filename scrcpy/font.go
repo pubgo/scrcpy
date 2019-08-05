@@ -18,6 +18,7 @@ func OpenFont(path string, size int) (*Font, error) {
 	if f, err := ttf.OpenFont(path, size); err != nil {
 		return nil, err
 	} else {
+		//f.SetStyle(ttf.STYLE_BOLD)
 		f.SetStyle(ttf.STYLE_BOLD)
 		return &Font{f}, nil
 	}

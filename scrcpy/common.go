@@ -36,7 +36,7 @@ func DebugLevelWrap(l int) DebugLevel {
 	return DebugLevel(l % 6)
 }
 
-var debugOpt = DebugLevelMin
+var debugOpt = DebugLevelDebug
 
 type size struct {
 	width  uint16

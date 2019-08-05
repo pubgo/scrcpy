@@ -241,7 +241,7 @@ func (s *screen) updateFrame(frames *frame) error {
 		return err
 	}
 	frames.mutex.Unlock()
-	s.render()
+	s. render()
 	return nil
 }
 

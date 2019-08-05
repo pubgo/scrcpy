@@ -78,6 +78,7 @@ type controlHandler struct {
 func (ch *controlHandler) Init(r *sdl.Renderer) {
 	var err error
 	if ch.font == nil {
+		fmt.Println(filepath.Join(sdl.GetBasePath(), "res", "YaHei.Consolas.1.12.ttf"))
 		if ch.font, err = OpenFont(filepath.Join(sdl.GetBasePath(), "res", "YaHei.Consolas.1.12.ttf"), 35); err != nil {
 			panic(err)
 		}
@@ -86,6 +87,7 @@ func (ch *controlHandler) Init(r *sdl.Renderer) {
 	if ch.displayPosition == nil {
 		ch.displayPosition = &sdl.Rect{}
 	}
+
 	ch.textTexture = new(TextTexture)
 	ch.displayPosition.X = 50
 	ch.displayPosition.Y = 50
@@ -110,7 +112,14 @@ func (ch *controlHandler) Render(r *sdl.Renderer) {
 		fmt.Fprintf(&ch.textBuf, "自动压枪：%v", gunPressArray[ch.gunPress%len(gunPressArray)])
 	}
 
-	ch.textTexture.Update(r, ch.font, ch.textBuf.String(), sdl.Color{}, ch.displayPosition)
+	_c := sdl.Color{}
+	_r, g, b, a, _ := r.GetDrawColor()
+	_c.R = _r
+	_c.G = g
+	_c.B = b
+	_c.A = a
+
+	ch.textTexture.Update(r, ch.font, ch.textBuf.String(),_c, ch.displayPosition)
 	ch.textTexture.Render(r, ch.displayPosition)
 }
 

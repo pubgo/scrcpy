@@ -53,9 +53,9 @@ func Main(opt *Option) (err error) {
 	if deviceName, screenSize, err = svr.ReadDeviceInfo(); err != nil {
 		return
 	}
-	if debugOpt.Debug() {
+	//if debugOpt.Debug() {
 		log.Printf("device name: %s, screen %v\n", deviceName, screenSize)
-	}
+	//}
 
 	frames := &frame{}
 	if err = frames.Init(); err != nil {
