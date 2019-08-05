@@ -148,11 +148,11 @@ type fingerState [8]bool
 
 var fingers fingerState
 
-func (f *fingerState) GetId() int {
+func (f *fingerState) GetId() *int {
 	for i := range f[:] {
 		if !f[i] {
 			f[i] = true
-			return i
+			return &i
 		}
 	}
 	panic("finger number over 8")

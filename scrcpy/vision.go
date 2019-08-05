@@ -133,7 +133,7 @@ func (v *visionController) fingerUp() {
 
 func (v *visionController) fingerDown() {
 	if v.id == 0 {
-		v.id = fingers.GetId()
+		v.id = *fingers.GetId()
 		v.cachePoint = v.getVisionCenterPoint()
 		v.sendEventDelay(mouseVisionDelay)
 		if debugOpt.Info() {

@@ -160,7 +160,7 @@ func (dc *directionController) sendMouseEvent(controller Controller) error {
 			return nil
 		}
 
-		dc.id = fingers.GetId()
+		dc.id = *fingers.GetId()
 		point := dc.getPoint(false)
 		sme := singleMouseEvent{action: AMOTION_EVENT_ACTION_DOWN}
 		sme.id = dc.id

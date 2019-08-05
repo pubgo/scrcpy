@@ -33,7 +33,7 @@ func (ca *controllerAnimation) inProgress(data interface{}) time.Duration {
 		panic("error state")
 	}
 	if n == 0 {
-		ca.id = fingers.GetId()
+		ca.id = *fingers.GetId()
 	}
 	sme := singleMouseEvent{action: eventConstants[n]}
 	sme.id = ca.id
