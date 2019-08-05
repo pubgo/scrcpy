@@ -27,7 +27,7 @@ type directionController struct {
 	middlePoint *Point
 	radius      uint16
 	keyMap      map[int]UserOperation
-	id          *int
+	id          int
 	startFlag   int32
 	animator
 }
@@ -154,7 +154,7 @@ func (dc *directionController) inProgress(data interface{}) time.Duration {
 }
 
 func (dc *directionController) sendMouseEvent(controller Controller) error {
-	if dc.id == nil {
+	if dc.id == 0 {
 		if dc.allUp() {
 			atomic.StoreInt32(&dc.startFlag, 0)
 			return nil
@@ -163,7 +163,7 @@ func (dc *directionController) sendMouseEvent(controller Controller) error {
 		dc.id = fingers.GetId()
 		point := dc.getPoint(false)
 		sme := singleMouseEvent{action: AMOTION_EVENT_ACTION_DOWN}
-		sme.id = *dc.id
+		sme.id = dc.id
 		sme.Point = point
 		return controller.PushEvent(&sme)
 	} else {
@@ -175,12 +175,12 @@ func (dc *directionController) sendMouseEvent(controller Controller) error {
 			sme.action = AMOTION_EVENT_ACTION_MOVE
 			point = dc.getPoint(true)
 		}
-		sme.id = *dc.id
+		sme.id = dc.id
 		sme.Point = point
 		b := controller.PushEvent(&sme)
 		if dc.allUp() {
 			fingers.Recycle(dc.id)
-			dc.id = nil
+			dc.id = 0
 			atomic.StoreInt32(&dc.startFlag, 0)
 		}
 		return b

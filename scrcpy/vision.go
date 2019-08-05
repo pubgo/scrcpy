@@ -26,7 +26,7 @@ type visionController struct {
 
 	center     *Point
 	cachePoint *Point
-	id         *int
+	id         int
 	timer      *time.Timer
 }
 
@@ -121,10 +121,10 @@ func (v *visionController) handleSdlEvent(typ uint32) bool {
 
 func (v *visionController) fingerUp() {
 	v.stopEventDelay()
-	if v.id != nil {
-		v.sendMouseEvent(AMOTION_EVENT_ACTION_UP, *v.id, v.cachePoint)
+	if v.id != 0 {
+		v.sendMouseEvent(AMOTION_EVENT_ACTION_UP, v.id, v.cachePoint)
 		fingers.Recycle(v.id)
-		v.id = nil
+		v.id = 0
 		if debugOpt.Info() {
 			log.Println("视角控制，松开，点：", v.cachePoint)
 		}
@@ -132,14 +132,14 @@ func (v *visionController) fingerUp() {
 }
 
 func (v *visionController) fingerDown() {
-	if v.id == nil {
+	if v.id == 0 {
 		v.id = fingers.GetId()
 		v.cachePoint = v.getVisionCenterPoint()
 		v.sendEventDelay(mouseVisionDelay)
 		if debugOpt.Info() {
 			log.Println("视角控制，开始，点：", v.cachePoint)
 		}
-		v.sendMouseEvent(AMOTION_EVENT_ACTION_DOWN, *v.id, v.cachePoint)
+		v.sendMouseEvent(AMOTION_EVENT_ACTION_DOWN, v.id, v.cachePoint)
 	}
 }
 
@@ -157,12 +157,12 @@ func (v *visionController) fingerMove(x, y int32, accurate bool) {
 		if debugOpt.Info() {
 			log.Printf("视角控制(%d, %d)，点：%s\n", x, y, v.cachePoint)
 		}
-		v.sendMouseEvent(AMOTION_EVENT_ACTION_MOVE, *v.id, v.cachePoint)
+		v.sendMouseEvent(AMOTION_EVENT_ACTION_MOVE, v.id, v.cachePoint)
 	}
 }
 
 func (v *visionController) visionControl(x, y int32) {
-	if v.id == nil {
+	if v.id == 0 {
 		v.fingerDown()
 	} else {
 		v.fingerMove(x, y, false)
@@ -170,7 +170,7 @@ func (v *visionController) visionControl(x, y int32) {
 }
 
 func (v *visionController) visionControl2(x, y int32) {
-	if v.id == nil {
+	if v.id == 0 {
 		v.fingerDown()
 	} else {
 		v.fingerMove(x, y, true)

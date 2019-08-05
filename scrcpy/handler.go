@@ -52,10 +52,10 @@ type controlHandler struct {
 	keyState map[int]*int
 	keyMap   map[int]UserOperation
 
-	ctrlKeyState map[int]*int
+	ctrlKeyState map[int]int
 	ctrlKeyMap   map[int]UserOperation
 
-	mouseKeyState map[uint8]*int
+	mouseKeyState map[uint8]int
 	mouseKeyMap   map[uint8]UserOperation
 
 	wheelCachePointer *Point
@@ -121,8 +121,8 @@ func newControlHandler(controller Controller,
 	ch := controlHandler{controller: controller}
 	controller.Register(&ch)
 	ch.keyState = make(map[int]*int)
-	ch.ctrlKeyState = make(map[int]*int)
-	ch.mouseKeyState = make(map[uint8]*int)
+	ch.ctrlKeyState = make(map[int]int)
+	ch.mouseKeyState = make(map[uint8]int)
 	ch.keyMap = keyMap
 	ch.ctrlKeyMap = ctrlKeyMap
 	ch.mouseKeyMap = mouseKeyMap
@@ -161,10 +161,10 @@ func (ch *controlHandler) HandleSdlEvent(event sdl.Event) (bool, error) {
 	case eventWheelEvent:
 		var b bool
 		var e error
-		if ch.keyState[wheelKeyCode] != nil {
-			b, e = ch.sendMouseEvent(AMOTION_EVENT_ACTION_UP, *ch.keyState[wheelKeyCode], ch.wheelCachePointer)
+		if ch.keyState[wheelKeyCode] != 0 {
+			b, e = ch.sendMouseEvent(AMOTION_EVENT_ACTION_UP, ch.keyState[wheelKeyCode], ch.wheelCachePointer)
 			fingers.Recycle(ch.keyState[wheelKeyCode])
-			ch.keyState[wheelKeyCode] = nil
+			ch.keyState[wheelKeyCode] = 0
 		}
 		return b, e
 
@@ -226,27 +226,28 @@ func (ch *controlHandler) startGunPress(interval time.Duration, delta int) {
 }
 
 func (ch *controlHandler) startMainPointerMotion(x, y int32) {
-	if ch.keyState[mainPointerKeyCode] == nil {
+	if ch.keyState[mainPointerKeyCode] == 0 {
 		ch.keyState[mainPointerKeyCode] = fingers.GetId()
-		ch.sendMouseEvent(AMOTION_EVENT_ACTION_DOWN, *ch.keyState[mainPointerKeyCode], &Point{uint16(x), uint16(y)})
+		ch.sendMouseEvent(AMOTION_EVENT_ACTION_DOWN, ch.keyState[mainPointerKeyCode], &Point{uint16(x), uint16(y)})
 	} else {
 		panic("main pointer state error")
 	}
 }
 
 func (ch *controlHandler) continueMainPointerMotion(x, y int32) {
-	if ch.keyState[mainPointerKeyCode] != nil {
-		ch.sendMouseEvent(AMOTION_EVENT_ACTION_MOVE, *ch.keyState[mainPointerKeyCode], &Point{uint16(x), uint16(y)})
+	fmt.Println(x,y,mainPointerKeyCode,ch.keyState)
+	if ch.keyState[mainPointerKeyCode] != 0 {
+		ch.sendMouseEvent(AMOTION_EVENT_ACTION_MOVE, ch.keyState[mainPointerKeyCode], &Point{uint16(x), uint16(y)})
 	} else {
 		panic("main pointer state error")
 	}
 }
 
 func (ch *controlHandler) stopMainPointerMotion(x, y int32) {
-	if ch.keyState[mainPointerKeyCode] != nil {
-		ch.sendMouseEvent(AMOTION_EVENT_ACTION_UP, *ch.keyState[mainPointerKeyCode], &Point{uint16(x), uint16(y)})
+	if ch.keyState[mainPointerKeyCode] != 0 {
+		ch.sendMouseEvent(AMOTION_EVENT_ACTION_UP, ch.keyState[mainPointerKeyCode], &Point{uint16(x), uint16(y)})
 		fingers.Recycle(ch.keyState[mainPointerKeyCode])
-		ch.keyState[mainPointerKeyCode] = nil
+		ch.keyState[mainPointerKeyCode] = 0
 	}
 }
 
@@ -285,12 +286,12 @@ func (ch *controlHandler) handleMouseButtonDown(event *sdl.MouseButtonEvent) (bo
 
 			switch ch.doubleHit {
 			case 0:
-				if ch.keyState[FireKeyCode] == nil {
+				if ch.keyState[FireKeyCode] == 0 {
 					ch.keyState[FireKeyCode] = fingers.GetId()
 					if debugOpt.Debug() {
 						log.Println("按下开火键")
 					}
-					ch.sendMouseEvent(AMOTION_EVENT_ACTION_DOWN, *ch.keyState[FireKeyCode], ch.keyMap[FireKeyCode].(*Point))
+					ch.sendMouseEvent(AMOTION_EVENT_ACTION_DOWN, ch.keyState[FireKeyCode], ch.keyMap[FireKeyCode].(*Point))
 				}
 				if debugOpt.Debug() {
 					log.Println("正常开火")
@@ -306,9 +307,9 @@ func (ch *controlHandler) handleMouseButtonDown(event *sdl.MouseButtonEvent) (bo
 		}
 	} else if ch.mouseKeyMap[event.Button] != nil {
 		if p, ok := ch.mouseKeyMap[event.Button].(*Point); ok {
-			if ch.mouseKeyState[event.Button] == nil {
+			if ch.mouseKeyState[event.Button] == 0 {
 				ch.mouseKeyState[event.Button] = fingers.GetId()
-				ch.sendMouseEvent(AMOTION_EVENT_ACTION_DOWN, *ch.mouseKeyState[event.Button], p)
+				ch.sendMouseEvent(AMOTION_EVENT_ACTION_DOWN, ch.mouseKeyState[event.Button], p)
 			}
 		}
 	}
@@ -327,10 +328,10 @@ func (ch *controlHandler) handleMouseButtonUp(event *sdl.MouseButtonEvent) (bool
 		ch.stopGunPress()
 
 		if sdl.GetRelativeMouseMode() {
-			if ch.keyState[FireKeyCode] != nil {
-				b, e := ch.sendMouseEvent(AMOTION_EVENT_ACTION_UP, *ch.keyState[FireKeyCode], ch.keyMap[FireKeyCode].(*Point))
+			if ch.keyState[FireKeyCode] != 0 {
+				b, e := ch.sendMouseEvent(AMOTION_EVENT_ACTION_UP, ch.keyState[FireKeyCode], ch.keyMap[FireKeyCode].(*Point))
 				fingers.Recycle(ch.keyState[FireKeyCode])
-				ch.keyState[FireKeyCode] = nil
+				ch.keyState[FireKeyCode] = 0
 				if debugOpt.Debug() {
 					log.Println("松开开火键")
 				}
@@ -339,10 +340,10 @@ func (ch *controlHandler) handleMouseButtonUp(event *sdl.MouseButtonEvent) (bool
 		}
 	} else if ch.mouseKeyMap[event.Button] != nil {
 		if p, ok := ch.mouseKeyMap[event.Button].(*Point); ok {
-			if ch.mouseKeyState[event.Button] != nil {
-				ch.sendMouseEvent(AMOTION_EVENT_ACTION_UP, *ch.mouseKeyState[event.Button], p)
+			if ch.mouseKeyState[event.Button] != 0 {
+				ch.sendMouseEvent(AMOTION_EVENT_ACTION_UP, ch.mouseKeyState[event.Button], p)
 				fingers.Recycle(ch.mouseKeyState[event.Button])
-				ch.mouseKeyState[event.Button] = nil
+				ch.mouseKeyState[event.Button] = 0
 			}
 		} else if pms, ok := ch.mouseKeyMap[event.Button].([]*PointMacro); ok {
 			ca := newControllerAnimation(ch.controller, pms)
@@ -426,11 +427,11 @@ func (ch *controlHandler) handleKeyDown(event *sdl.KeyboardEvent) (bool, error) 
 		keyCode := int(event.Keysym.Sym)
 		if ch.ctrlKeyMap[keyCode] != nil {
 			if p, ok := ch.ctrlKeyMap[keyCode].(*Point); ok {
-				if ch.ctrlKeyState[keyCode] == nil {
+				if ch.ctrlKeyState[keyCode] == 0 {
 					ch.ctrlKeyState[keyCode] = fingers.GetId()
-					return ch.sendMouseEvent(AMOTION_EVENT_ACTION_DOWN, *ch.ctrlKeyState[keyCode], p)
+					return ch.sendMouseEvent(AMOTION_EVENT_ACTION_DOWN, ch.ctrlKeyState[keyCode], p)
 				} else {
-					return ch.sendMouseEvent(AMOTION_EVENT_ACTION_MOVE, *ch.ctrlKeyState[keyCode], p)
+					return ch.sendMouseEvent(AMOTION_EVENT_ACTION_MOVE, ch.ctrlKeyState[keyCode], p)
 				}
 			}
 		}
@@ -469,18 +470,18 @@ func (ch *controlHandler) handleKeyDown(event *sdl.KeyboardEvent) (bool, error) 
 		keyCode := int(event.Keysym.Sym)
 		if ch.keyMap[keyCode] != nil {
 			if p, ok := ch.keyMap[keyCode].(*Point); ok {
-				if ch.keyState[keyCode] == nil {
+				if ch.keyState[keyCode] == 0 {
 					ch.keyState[keyCode] = fingers.GetId()
-					return ch.sendMouseEvent(AMOTION_EVENT_ACTION_DOWN, *ch.keyState[keyCode], p)
+					return ch.sendMouseEvent(AMOTION_EVENT_ACTION_DOWN, ch.keyState[keyCode], p)
 				} else {
-					return ch.sendMouseEvent(AMOTION_EVENT_ACTION_MOVE, *ch.keyState[keyCode], p)
+					return ch.sendMouseEvent(AMOTION_EVENT_ACTION_MOVE, ch.keyState[keyCode], p)
 				}
 			} else if sp, ok := ch.keyMap[keyCode].(*SPoint); ok {
-				if ch.keyState[keyCode] == nil {
+				if ch.keyState[keyCode] == 0 {
 					ch.keyState[keyCode] = fingers.GetId()
-					return ch.sendMouseEvent(AMOTION_EVENT_ACTION_DOWN, *ch.keyState[keyCode], sp)
+					return ch.sendMouseEvent(AMOTION_EVENT_ACTION_DOWN, ch.keyState[keyCode], sp)
 				} else {
-					return ch.sendMouseEvent(AMOTION_EVENT_ACTION_MOVE, *ch.keyState[keyCode], sp)
+					return ch.sendMouseEvent(AMOTION_EVENT_ACTION_MOVE, ch.keyState[keyCode], sp)
 				}
 			}
 		}
@@ -562,9 +563,9 @@ func (ch *controlHandler) handleKeyUp(event *sdl.KeyboardEvent) (bool, error) {
 		keyCode := int(event.Keysym.Sym)
 		if ch.ctrlKeyMap[keyCode] != nil {
 			if p, ok := ch.ctrlKeyMap[keyCode].(*Point); ok {
-				ch.sendMouseEvent(AMOTION_EVENT_ACTION_UP, *ch.ctrlKeyState[keyCode], p)
+				ch.sendMouseEvent(AMOTION_EVENT_ACTION_UP, ch.ctrlKeyState[keyCode], p)
 				fingers.Recycle(ch.ctrlKeyState[keyCode])
-				ch.ctrlKeyState[keyCode] = nil
+				ch.ctrlKeyState[keyCode] = 0
 				return true, nil
 			} else if pms, ok := ch.ctrlKeyMap[keyCode].([]*PointMacro); ok {
 				ca := newControllerAnimation(ch.controller, pms)
@@ -617,18 +618,18 @@ func (ch *controlHandler) handleKeyUp(event *sdl.KeyboardEvent) (bool, error) {
 		keyCode := int(event.Keysym.Sym)
 		if ch.keyMap[keyCode] != nil {
 			if p, ok := ch.keyMap[keyCode].(*Point); ok {
-				if ch.keyState[keyCode] != nil {
-					b, e := ch.sendMouseEvent(AMOTION_EVENT_ACTION_UP, *ch.keyState[keyCode], p)
+				if ch.keyState[keyCode] != 0 {
+					b, e := ch.sendMouseEvent(AMOTION_EVENT_ACTION_UP, ch.keyState[keyCode], p)
 					fingers.Recycle(ch.keyState[keyCode])
-					ch.keyState[keyCode] = nil
+					ch.keyState[keyCode] = 0
 					return b, e
 				}
 			} else if sp, ok := ch.keyMap[keyCode].(*SPoint); ok {
 				sdl.SetRelativeMouseMode(!sdl.GetRelativeMouseMode())
-				if ch.keyState[keyCode] != nil {
-					b, e := ch.sendMouseEvent(AMOTION_EVENT_ACTION_UP, *ch.keyState[keyCode], sp)
+				if ch.keyState[keyCode] != 0 {
+					b, e := ch.sendMouseEvent(AMOTION_EVENT_ACTION_UP, ch.keyState[keyCode], sp)
 					fingers.Recycle(ch.keyState[keyCode])
-					ch.keyState[keyCode] = nil
+					ch.keyState[keyCode] = 0
 					return b, e
 				}
 			} else if pms, ok := ch.keyMap[keyCode].([]*PointMacro); ok {
@@ -645,11 +646,11 @@ func (ch *controlHandler) handleMouseWheelMotion(event *sdl.MouseWheelEvent) (bo
 	if debugOpt.Debug() {
 		log.Printf("x: %d, y: %d, direction: %d\n", event.X, event.Y, event.Direction)
 	}
-	if ch.keyState[wheelKeyCode] == nil {
+	if ch.keyState[wheelKeyCode] == 0 {
 		ch.keyState[wheelKeyCode] = fingers.GetId()
 		ch.wheelCachePointer = ch.keyMap[sdl.K_g].(*Point)
 		ch.sendEventDelay(eventWheelEvent, 150*time.Millisecond)
-		return ch.sendMouseEvent(AMOTION_EVENT_ACTION_DOWN, *ch.keyState[wheelKeyCode], ch.wheelCachePointer)
+		return ch.sendMouseEvent(AMOTION_EVENT_ACTION_DOWN, ch.keyState[wheelKeyCode], ch.wheelCachePointer)
 	} else {
 		deltaY := event.Y * 10
 		tmp := int32(ch.wheelCachePointer.Y) + deltaY
@@ -660,7 +661,7 @@ func (ch *controlHandler) handleMouseWheelMotion(event *sdl.MouseWheelEvent) (bo
 		}
 		ch.wheelCachePointer.Y = uint16(tmp)
 		ch.sendEventDelay(eventWheelEvent, 150*time.Millisecond)
-		return ch.sendMouseEvent(AMOTION_EVENT_ACTION_MOVE, *ch.keyState[wheelKeyCode], ch.wheelCachePointer)
+		return ch.sendMouseEvent(AMOTION_EVENT_ACTION_MOVE, ch.keyState[wheelKeyCode], ch.wheelCachePointer)
 	}
 	return true, nil
 }

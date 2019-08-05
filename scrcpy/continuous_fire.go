@@ -6,11 +6,12 @@ import (
 )
 
 type continuousFire struct {
-	animator
-	stopFlag int32
 	*Point
+	*animator
+	stopFlag int32
+
 	state    int
-	id       *int
+	id       int
 	interval time.Duration
 }
 
@@ -35,23 +36,23 @@ func (cf *continuousFire) inProgress(data interface{}) time.Duration {
 		switch cf.state {
 		case 0:
 			cf.id = fingers.GetId()
-			cf.sendMouseEvent(c, AMOTION_EVENT_ACTION_DOWN, *cf.id)
+			cf.sendMouseEvent(c, AMOTION_EVENT_ACTION_DOWN, cf.id)
 			cf.state++
 			return cf.interval
 
 		case 1:
-			cf.sendMouseEvent(c, AMOTION_EVENT_ACTION_UP, *cf.id)
+			cf.sendMouseEvent(c, AMOTION_EVENT_ACTION_UP, cf.id)
 			fingers.Recycle(cf.id)
-			cf.id = nil
+			cf.id = 0
 			cf.state++
 			return cf.interval
 		}
 		panic("can't reach here")
 	} else {
-		if cf.id != nil {
-			cf.sendMouseEvent(c, AMOTION_EVENT_ACTION_UP, *cf.id)
+		if cf.id != 0 {
+			cf.sendMouseEvent(c, AMOTION_EVENT_ACTION_UP, cf.id)
 			fingers.Recycle(cf.id)
-			cf.id = nil
+			cf.id = 0
 		}
 		return 0
 	}

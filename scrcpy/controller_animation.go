@@ -8,7 +8,7 @@ type controllerAnimation struct {
 	pointIntervals []*PointMacro
 	state          int
 	controller     Controller
-	id             *int
+	id             int
 	animator
 }
 
@@ -36,12 +36,12 @@ func (ca *controllerAnimation) inProgress(data interface{}) time.Duration {
 		ca.id = fingers.GetId()
 	}
 	sme := singleMouseEvent{action: eventConstants[n]}
-	sme.id = *ca.id
+	sme.id = ca.id
 	sme.Point = ca.pointIntervals[m].Point
 	ca.controller.PushEvent(&sme)
 	if n == 1 {
 		fingers.Recycle(ca.id)
-		ca.id = nil
+		ca.id = 0
 	}
 	ca.state++
 	if n < 1 {
