@@ -77,4 +77,3 @@ gradle
 gradlew*
 /scrcpy-go
 vendor
-.idea
