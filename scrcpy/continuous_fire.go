@@ -8,7 +8,7 @@ import (
 type continuousFire struct {
 	animator
 	stopFlag int32
-	Point
+	*Point
 	state    int
 	id       *int
 	interval time.Duration

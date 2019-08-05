@@ -164,7 +164,7 @@ func (dc *directionController) sendMouseEvent(controller Controller) error {
 		point := dc.getPoint(false)
 		sme := singleMouseEvent{action: AMOTION_EVENT_ACTION_DOWN}
 		sme.id = *dc.id
-		sme.Point = *point
+		sme.Point = point
 		return controller.PushEvent(&sme)
 	} else {
 		point := &dc.cachePoint
@@ -176,7 +176,7 @@ func (dc *directionController) sendMouseEvent(controller Controller) error {
 			point = dc.getPoint(true)
 		}
 		sme.id = *dc.id
-		sme.Point = *point
+		sme.Point = point
 		b := controller.PushEvent(&sme)
 		if dc.allUp() {
 			fingers.Recycle(dc.id)

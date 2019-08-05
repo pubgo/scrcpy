@@ -21,11 +21,11 @@ const eventVisionEventUp = sdl.USEREVENT + 3
 // 视野控制器
 type visionController struct {
 	controller  Controller
-	topLeft     Point
-	bottomRight Point
+	topLeft     *Point
+	bottomRight *Point
 
 	center     *Point
-	cachePoint Point
+	cachePoint *Point
 	id         *int
 	timer      *time.Timer
 }
@@ -33,8 +33,8 @@ type visionController struct {
 func newVisionController(controller Controller, topLeft, bottomRight *Point) *visionController {
 	return &visionController{
 		controller:  controller,
-		topLeft:     *topLeft,
-		bottomRight: *bottomRight,
+		topLeft:     topLeft,
+		bottomRight: bottomRight,
 	}
 }
 
@@ -86,7 +86,7 @@ func fixMouseBlock(x int32) int32 {
 	return ret
 }
 
-func (v *visionController) sendMouseEvent(action androidMotionEventAction, id int, p Point) error {
+func (v *visionController) sendMouseEvent(action androidMotionEventAction, id int, p *Point) error {
 	sme := singleMouseEvent{action: action}
 	sme.id = id
 	sme.Point = p
@@ -134,7 +134,7 @@ func (v *visionController) fingerUp() {
 func (v *visionController) fingerDown() {
 	if v.id == nil {
 		v.id = fingers.GetId()
-		v.cachePoint = *v.getVisionCenterPoint()
+		v.cachePoint = v.getVisionCenterPoint()
 		v.sendEventDelay(mouseVisionDelay)
 		if debugOpt.Info() {
 			log.Println("视角控制，开始，点：", v.cachePoint)
@@ -150,7 +150,7 @@ func (v *visionController) fingerMove(x, y int32, accurate bool) {
 	}
 	v.cachePoint.X = uint16(int32(v.cachePoint.X) + x)
 	v.cachePoint.Y = uint16(int32(v.cachePoint.Y) + y)
-	if v.outside(&v.cachePoint) {
+	if v.outside(v.cachePoint) {
 		v.fingerUp()
 	} else {
 		v.sendEventDelay(mouseVisionDelay)

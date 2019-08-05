@@ -31,7 +31,7 @@ const (
 )
 
 type touchPoint struct {
-	Point
+	*Point
 	id int
 }
 

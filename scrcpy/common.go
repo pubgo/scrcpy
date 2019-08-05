@@ -61,11 +61,11 @@ func (p Point) String() string {
 }
 
 type PointMacro struct {
-	Point
+	*Point
 	Interval time.Duration
 }
 
-type SPoint Point
+type SPoint=Point
 
 type UserOperation interface {
 }

@@ -161,7 +161,7 @@ func parseUserOperation(entry *Entry) scrcpy.UserOperation {
 		var list []*scrcpy.PointMacro
 		for _, m := range entry.Macro {
 			list = append(list, &scrcpy.PointMacro{
-				Point:    scrcpy.Point{uint16(m.Point.X), uint16(m.Point.Y)},
+				Point:    &scrcpy.Point{uint16(m.Point.X), uint16(m.Point.Y)},
 				Interval: time.Duration(m.Delay) * time.Millisecond})
 		}
 		return list

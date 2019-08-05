@@ -29,7 +29,7 @@ func Main(opt *Option) (err error) {
 	mouseSensitive = opt.MouseSensitive
 	setConfigs(opt.Hits, opt.Stables)
 
-	svr := server{}
+	svr := &server{}
 	svrOpt := serverOption{serial: opt.Serial, localPort: opt.Port, bitRate: opt.BitRate}
 
 	if err = svr.Start(&svrOpt); err != nil {
@@ -57,13 +57,13 @@ func Main(opt *Option) (err error) {
 		log.Printf("device name: %s, screen %v\n", deviceName, screenSize)
 	}
 
-	frames := frame{}
+	frames := &frame{}
 	if err = frames.Init(); err != nil {
 		return
 	}
 	defer frames.Close()
 
-	decoder := getDecoder(&frames, svr.deviceConn)
+	decoder := getDecoder(frames, svr.deviceConn)
 	decoder.Start()
 
 	screen := &screen{}
@@ -76,7 +76,7 @@ func Main(opt *Option) (err error) {
 
 	looper := NewSdlEventLooper()
 
-	fh := &frameHandler{screen: screen, frames: &frames}
+	fh := &frameHandler{screen: screen, frames: frames}
 	looper.Register(fh)
 
 	ch := newControlHandler(controller,
