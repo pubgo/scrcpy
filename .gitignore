@@ -77,3 +77,4 @@ gradle
 gradlew*
 /scrcpy-go
 vendor
+main
