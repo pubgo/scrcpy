@@ -1,0 +1,9 @@
+github.com/ClarkGuan/go-sdl2 v0.3.0 h1:de2Uy7CSYcDMEYfyLIKSfLs0cqjqUZ0hwr29UdcjQuI=
+github.com/ClarkGuan/go-sdl2 v0.3.0/go.mod h1:48jg+tCB8sKWiAYR1WDu32jk5Gl6+Vrhv9r13P5aMis=
+github.com/ClarkGuan/scrcpy-go v0.0.0-20190721124956-0064f6796030 h1:qPH0RLPNutb19SkbMflbh+xbIilcLfMYSD5sdkGd1Xk=
+github.com/ClarkGuan/scrcpy-go v0.0.0-20190721124956-0064f6796030/go.mod h1:WDqbVy+9MBSlKAhBFk5xugXVTRB2ipNoHWYAx0H9Nd0=
+github.com/veandco/go-sdl2 v0.3.0 h1:IWYkHMp8V3v37NsKjszln8FFnX2+ab0538J371t+rss=
+github.com/veandco/go-sdl2 v0.3.0/go.mod h1:FB+kTpX9YTE+urhYiClnRzpOXbiWgaU3+5F2AB78DPg=
+gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
+gopkg.in/yaml.v2 v2.2.2 h1:ZCJp+EgiOT7lHqUV2J862kp8Qj64Jo6az82+3Td9dZw=
+gopkg.in/yaml.v2 v2.2.2/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=
