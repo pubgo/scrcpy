@@ -45,6 +45,8 @@ static int hw_decoder_init(AVCodecContext *ctx,
 }
 
 int run_decoder() {
+//    fprintf(stdout, "H.264 decoder not found\n");
+
     AVCodec *codec = avcodec_find_decoder(AV_CODEC_ID_H264);
     if (!codec) {
         fprintf(stderr, "H.264 decoder not found\n");

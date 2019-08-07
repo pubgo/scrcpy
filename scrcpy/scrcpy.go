@@ -1,11 +1,10 @@
 package scrcpy
 
 import (
+	"github.com/veandco/go-sdl2/sdl"
 	"log"
 	"runtime"
 	"time"
-
-	"github.com/veandco/go-sdl2/sdl"
 )
 
 type Option struct {
@@ -53,8 +52,10 @@ func Main(opt *Option) (err error) {
 	if deviceName, screenSize, err = svr.ReadDeviceInfo(); err != nil {
 		return
 	}
+
+	log.Println(deviceName, screenSize, screenSize.Center())
 	//if debugOpt.Debug() {
-		log.Printf("device name: %s, screen %v\n", deviceName, screenSize)
+	log.Printf("device name: %s, screen %v\n", deviceName, screenSize)
 	//}
 
 	frames := &frame{}
@@ -66,25 +67,25 @@ func Main(opt *Option) (err error) {
 	decoder := getDecoder(frames, svr.deviceConn)
 	decoder.Start()
 
-	screen := &screen{}
-	if err = screen.InitRendering(deviceName, screenSize); err != nil {
-		return
-	}
+	//screen := &screen{}
+	//if err = screen.InitRendering(deviceName, screenSize); err != nil {
+	//	return
+	//}
 
-	controller := newController(svr.deviceConn, screen)
-	controller.Start()
+	//controller := newController(svr.deviceConn, screen)
+	//controller.Start()
 
 	looper := NewSdlEventLooper()
 
-	fh := &frameHandler{screen: screen, frames: frames}
-	looper.Register(fh)
+	//fh := &frameHandler{screen: screen, frames: frames}
+	//looper.Register(fh)
 
-	ch := newControlHandler(controller,
-		opt.KeyMap,
-		opt.CtrlKeyMap,
-		opt.MouseKeyMap)
-	looper.Register(ch)
-	screen.addRendererFunc(ch)
+	//ch := newControlHandler(controller,
+	//	opt.KeyMap,
+	//	opt.CtrlKeyMap,
+	//	opt.MouseKeyMap)
+	//looper.Register(ch)
+	//screen.addRendererFunc(ch)
 
 	if err = looper.Loop(); err != nil {
 		log.Println(err)

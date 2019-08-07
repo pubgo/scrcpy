@@ -1,6 +1,7 @@
 package scrcpy
 
 import (
+	"fmt"
 	"github.com/veandco/go-sdl2/sdl"
 )
 
@@ -38,6 +39,7 @@ func (dl *defaultLooper) Remove(h SdlEventHandler) {
 func (dl *defaultLooper) Loop() error {
 	var ev sdl.Event
 	for ev = sdl.WaitEvent(); ev != nil; ev = sdl.WaitEvent() {
+		fmt.Println(ev)
 		if ev.GetType() == sdl.QUIT {
 			break
 		}

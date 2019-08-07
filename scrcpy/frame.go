@@ -12,9 +12,12 @@ package scrcpy
 import "C"
 import (
 	"errors"
+	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"net"
+	"os"
 	"reflect"
 	"runtime"
 	"sync"
@@ -208,6 +211,9 @@ func goAvHwframeTransferData() C.int {
 		goGetHardwareFrame(), 0)
 }
 
+var ss []byte
+var i int
+
 //export goReadPacket
 func goReadPacket(_, buf unsafe.Pointer, bufSize C.int) C.int {
 	d := gDecoder
@@ -217,11 +223,21 @@ func goReadPacket(_, buf unsafe.Pointer, bufSize C.int) C.int {
 	pb.Cap = int(bufSize)
 	pb.Len = int(bufSize)
 
+	fmt.Println(len(buffer))
 	if n, err := d.videoSock.Read(buffer); err == io.EOF {
 		return 0
 	} else if err != nil {
 		return -1
 	} else {
+		ss = append(ss, buffer...)
+		i++
+		fmt.Println(i)
+		if i == 100 {
+			ioutil.WriteFile("test.h264", ss, 0766)
+			os.Exit(-1)
+		}
+
+		//fmt.Println(buffer)
 		return C.int(n)
 	}
 }
@@ -241,7 +257,7 @@ func (s *screen) updateFrame(frames *frame) error {
 		return err
 	}
 	frames.mutex.Unlock()
-	s. render()
+	s.render()
 	return nil
 }
 

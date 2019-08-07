@@ -185,8 +185,9 @@ func (s *screen) render() {
 }
 
 func (s *screen) createTexture(w, h uint16) (err error) {
-	// 在 MacOS 上可以创建 NV12 的 Texture 进行硬件加速
+	// 在 MacOS 上可以创建 YV12 的 Texture 进行硬件加速
 	s.texture, err = s.renderer.CreateTexture(sdl.PIXELFORMAT_YV12, sdl.TEXTUREACCESS_STREAMING, int32(w), int32(h))
+
 	return
 }
 

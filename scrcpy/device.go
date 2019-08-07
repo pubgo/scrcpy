@@ -1,6 +1,9 @@
 package scrcpy
 
-import "io"
+import (
+	"fmt"
+	"io"
+)
 
 const deviceNameLength = 64
 
@@ -9,6 +12,8 @@ func (svr *server) ReadDeviceInfo() (deviceName string, screenSize size, err err
 	if _, err = io.ReadFull(svr.deviceConn, buf); err != nil {
 		return
 	}
+
+	fmt.Println(buf,len(buf))
 
 	deviceName = string(buf[:deviceNameLength])
 	screenSize.width = uint16(buf[deviceNameLength])<<8 | uint16(buf[deviceNameLength+1])
