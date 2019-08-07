@@ -39,9 +39,9 @@ func Main(opt *Option) (err error) {
 		svr.Close()
 	}()
 
-	if err = sdlInitAndConfigure(); err != nil {
-		return
-	}
+	//if err = sdlInitAndConfigure(); err != nil {
+	//	return
+	//}
 
 	if err = svr.ConnectTo(); err != nil {
 		return
@@ -58,13 +58,13 @@ func Main(opt *Option) (err error) {
 	log.Printf("device name: %s, screen %v\n", deviceName, screenSize)
 	//}
 
-	frames := &frame{}
-	if err = frames.Init(); err != nil {
-		return
-	}
-	defer frames.Close()
+	//frames := &frame{}
+	//if err = frames.Init(); err != nil {
+	//	return
+	//}
+	//defer frames.Close()
 
-	decoder := getDecoder(frames, svr.deviceConn)
+	decoder := getDecoder(nil, svr.deviceConn)
 	decoder.Start()
 
 	//screen := &screen{}
